@@ -21,7 +21,7 @@ export default function About() {
           </p>
           
           <p>
-            With [X] years of experience in the fashion industry, I've had the privilege 
+            With [X] years of experience in the fashion industry, I&apos;ve had the privilege 
             of working with renowned photographers, designers, and brands across the globe.
           </p>
         </div>

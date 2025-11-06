@@ -1,11 +1,55 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, MotionValue } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
 
 interface HeroProps {
   images?: Array<{ id: string; filename: string; title?: string }>
+}
+
+interface ImageLayerProps {
+  image: { id: string; filename: string; title?: string }
+  index: number
+  scrollYProgress: MotionValue<number>
+  startProgress: number
+  endProgress: number
+}
+
+function ImageLayer({ image, index, scrollYProgress, startProgress, endProgress }: ImageLayerProps) {
+  const opacity = useTransform(
+    scrollYProgress,
+    [startProgress, startProgress + 0.1, endProgress - 0.1, endProgress],
+    [0, 1, 1, 0]
+  )
+
+  const scale = useTransform(
+    scrollYProgress,
+    [startProgress, startProgress + 0.1, endProgress - 0.1, endProgress],
+    [1.1, 1, 1, 1.1]
+  )
+
+  return (
+    <motion.div
+      style={{ opacity, scale }}
+      className="absolute inset-0 bg-gray-100"
+    >
+      {image.filename ? (
+        <Image
+          src={`/uploads/${image.filename}`}
+          alt={image.title || 'Portfolio image'}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          priority={index === 0}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+          <p className="text-sm uppercase tracking-wider">Hero Image {index + 1}</p>
+        </div>
+      )}
+    </motion.div>
+  )
 }
 
 export default function Hero({ images = [] }: HeroProps) {
@@ -64,40 +108,16 @@ export default function Hero({ images = [] }: HeroProps) {
                 // Calculate opacity based on scroll position
                 const startProgress = index / displayImages.length
                 const endProgress = (index + 1) / displayImages.length
-                
-                const opacity = useTransform(
-                  scrollYProgress,
-                  [startProgress, startProgress + 0.1, endProgress - 0.1, endProgress],
-                  [0, 1, 1, 0]
-                )
-
-                const scale = useTransform(
-                  scrollYProgress,
-                  [startProgress, startProgress + 0.1, endProgress - 0.1, endProgress],
-                  [1.1, 1, 1, 1.1]
-                )
 
                 return (
-                  <motion.div
+                  <ImageLayer
                     key={image.id}
-                    style={{ opacity, scale }}
-                    className="absolute inset-0 bg-gray-100"
-                  >
-                    {image.filename ? (
-                      <Image
-                        src={`/uploads/${image.filename}`}
-                        alt={image.title || 'Portfolio image'}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        priority={index === 0}
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                        <p className="text-sm uppercase tracking-wider">Hero Image {index + 1}</p>
-                      </div>
-                    )}
-                  </motion.div>
+                    image={image}
+                    index={index}
+                    scrollYProgress={scrollYProgress}
+                    startProgress={startProgress}
+                    endProgress={endProgress}
+                  />
                 )
               })}
             </div>

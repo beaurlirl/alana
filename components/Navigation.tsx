@@ -7,11 +7,6 @@ import { usePathname } from 'next/navigation'
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
-  
-  // Hide navigation on admin page
-  if (pathname?.startsWith('/admin')) {
-    return null
-  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +16,11 @@ export default function Navigation() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+  
+  // Hide navigation on admin page
+  if (pathname?.startsWith('/admin')) {
+    return null
+  }
 
   const links = [
     { href: '/', label: 'Home' },
