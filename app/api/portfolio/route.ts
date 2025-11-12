@@ -24,33 +24,20 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
     
-    // Simple validation - just check it's an object with required fields
-    if (!data || typeof data !== 'object') {
-      return NextResponse.json({ error: 'Invalid data format' }, { status: 400 })
-    }
+    console.log('Received data to save:', JSON.stringify(data, null, 2))
     
-    // Ensure images array exists
-    if (!Array.isArray(data.images)) {
-      data.images = []
-    }
-    
-    // Ensure collections array exists  
-    if (!Array.isArray(data.collections)) {
-      data.collections = []
-    }
-    
-    // Ensure categories array exists
-    if (!Array.isArray(data.categories)) {
-      data.categories = ['Editorial', 'Commercial', 'Runway']
-    }
-
+    // Just save whatever we get - no validation
     await savePortfolioData(data)
+    
+    console.log('Save successful')
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Portfolio POST error:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Error details:', errorMessage)
     return NextResponse.json({ 
       error: 'Failed to save data',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: errorMessage
     }, { status: 500 })
   }
 }

@@ -1,5 +1,4 @@
-import fs from 'fs/promises'
-import path from 'path'
+import { kv } from '@vercel/kv'
 
 export interface PortfolioImage {
   id: string
@@ -25,7 +24,7 @@ export interface PortfolioData {
   collections: Collection[]
 }
 
-const dataFilePath = path.join(process.cwd(), 'data', 'portfolio.json')
+const KV_KEY = 'portfolio-data'
 
 const defaultData: PortfolioData = {
   images: [],
@@ -38,36 +37,30 @@ const defaultData: PortfolioData = {
 
 export async function getPortfolioData(): Promise<PortfolioData> {
   try {
-    const fileContent = await fs.readFile(dataFilePath, 'utf-8')
-    return JSON.parse(fileContent)
+    // Try to get data from Vercel KV
+    const data = await kv.get<PortfolioData>(KV_KEY)
+    
+    if (data) {
+      return data
+    }
+    
+    // If no data exists, initialize with default
+    await kv.set(KV_KEY, defaultData)
+    return defaultData
   } catch (error) {
-    // If file doesn't exist, create it with default data
-    await ensureDataDirectory()
-    await fs.writeFile(dataFilePath, JSON.stringify(defaultData, null, 2))
+    console.error('KV get error:', error)
+    // Fallback to default data if KV fails
     return defaultData
   }
 }
 
 export async function savePortfolioData(data: PortfolioData): Promise<void> {
-  await ensureDataDirectory()
-  await fs.writeFile(dataFilePath, JSON.stringify(data, null, 2))
-}
-
-async function ensureDataDirectory(): Promise<void> {
-  const dataDir = path.join(process.cwd(), 'data')
   try {
-    await fs.access(dataDir)
-  } catch {
-    await fs.mkdir(dataDir, { recursive: true })
-  }
-}
-
-export async function ensureUploadsDirectory(): Promise<void> {
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
-  try {
-    await fs.access(uploadsDir)
-  } catch {
-    await fs.mkdir(uploadsDir, { recursive: true })
+    await kv.set(KV_KEY, data)
+    console.log('Data saved to Vercel KV successfully')
+  } catch (error) {
+    console.error('KV save error:', error)
+    throw new Error('Failed to save to database')
   }
 }
 
