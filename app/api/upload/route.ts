@@ -39,10 +39,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid filename' }, { status: 400 })
     }
 
+    // Check if BLOB_READ_WRITE_TOKEN is set
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json({ 
+        error: 'Vercel Blob is not configured. Please set BLOB_READ_WRITE_TOKEN in your environment variables.',
+        details: 'See VERCEL_BLOB_SETUP.md for instructions'
+      }, { status: 500 })
+    }
+
     // Upload to Vercel Blob
     const blob = await put(filename, file, {
       access: 'public',
       addRandomSuffix: false,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     })
 
     return NextResponse.json({ 
@@ -52,10 +61,10 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to upload file',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
-
-// Configure runtime for Vercel
-export const runtime = 'edge'
 

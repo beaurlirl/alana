@@ -82,7 +82,7 @@ export default function Hero({ images = [] }: HeroProps) {
       style={{ minHeight: sectionHeight }}
       aria-label="Hero section with scroll-triggered images"
     >
-      <div className="sticky top-0 h-screen flex items-center px-6 md:px-12 lg:px-24 py-20">
+      <div className="sticky top-0 h-screen flex items-center px-6 md:px-12 lg:px-24 py-20 pt-32 md:py-20">
         <div className="max-w-screen-2xl w-full mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left Panel - Static Info */}
