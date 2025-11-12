@@ -329,7 +329,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         <section>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-900">
-              💡 <strong>Tip:</strong> Tag images as "Featured" in the Image Manager below to display them in the homepage hero scroll effect
+              💡 <strong>Tip:</strong> Tag images as &ldquo;Featured&rdquo; in the Image Manager below to display them in the homepage hero scroll effect
             </p>
           </div>
         </section>
