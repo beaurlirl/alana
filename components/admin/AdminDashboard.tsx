@@ -97,9 +97,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const handleImageUpdated = (updatedImage: PortfolioImage) => {
     if (!data) return
 
+    console.log('Updating image:', updatedImage.id, 'isHero:', updatedImage.isHero)
+
     const updatedImages = data.images.map(img =>
       img.id === updatedImage.id ? updatedImage : img
     )
+
+    console.log('Updated images array:', updatedImages.map(img => ({ id: img.id, isHero: img.isHero })))
 
     saveData({ ...data, images: updatedImages })
   }

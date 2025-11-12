@@ -62,9 +62,14 @@ export default function Hero({ images = [] }: HeroProps) {
 
   // Filter only images marked as hero/featured, then sort and limit
   const heroImageLimit = 8
-  const heroImages = images.filter(img => img.isHero)
+  const heroImages = images.filter(img => img.isHero === true)
   const sortedImages = [...heroImages].sort((a, b) => a.order - b.order)
   const limitedImages = sortedImages.slice(0, heroImageLimit)
+  
+  // Debug logging
+  console.log('Hero - Total images:', images.length)
+  console.log('Hero - Featured images:', heroImages.length)
+  console.log('Hero - Images with isHero:', images.map(img => ({ id: img.id, isHero: img.isHero })))
   
   const displayImages = limitedImages.length > 0 ? limitedImages : [
     { id: '1', filename: '', title: 'Image 1' },
