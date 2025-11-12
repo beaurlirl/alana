@@ -5,16 +5,16 @@ export const authSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
-// Portfolio image validation
+// Portfolio image validation (lenient)
 export const portfolioImageSchema = z.object({
   id: z.string(),
   filename: z.string(),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  order: z.number().int().min(0),
-  category: z.string().optional(),
-  collection: z.string().optional(),
-})
+  title: z.string().optional().default(''),
+  description: z.string().optional().default(''),
+  order: z.number().int().min(0).default(0),
+  category: z.string().optional().default(''),
+  collection: z.string().optional().default(''),
+}).passthrough() // Allow additional fields
 
 // Collection validation
 export const collectionSchema = z.object({
@@ -22,15 +22,15 @@ export const collectionSchema = z.object({
   category: z.string().min(1, 'Category is required'),
 })
 
-// Portfolio data validation
+// Portfolio data validation (lenient for flexibility)
 export const portfolioDataSchema = z.object({
-  images: z.array(portfolioImageSchema),
-  heroImage: z.string().optional(),
-  modelName: z.string().optional(),
-  heroTagline: z.string().optional(),
-  categories: z.array(z.string()),
-  collections: z.array(collectionSchema),
-})
+  images: z.array(portfolioImageSchema).default([]),
+  heroImage: z.string().optional().default(''),
+  modelName: z.string().optional().default(''),
+  heroTagline: z.string().optional().default(''),
+  categories: z.array(z.string()).default(['Editorial', 'Commercial', 'Runway']),
+  collections: z.array(collectionSchema).optional().default([]),
+}).passthrough() // Allow additional fields without validation
 
 // Delete image validation
 export const deleteImageSchema = z.object({

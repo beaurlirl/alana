@@ -25,13 +25,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Validate portfolio data
+    // Validate portfolio data with detailed error logging
     const validationResult = portfolioDataSchema.safeParse(body)
     if (!validationResult.success) {
+      console.error('Validation failed:', validationResult.error.flatten())
       return NextResponse.json(
         { 
           error: 'Validation error',
           details: validationResult.error.flatten().fieldErrors,
+          message: 'Please check the data format and try again'
         }, 
         { status: 400 }
       )
@@ -41,7 +43,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Portfolio POST error:', error)
-    return NextResponse.json({ error: 'Failed to save data' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ 
+      error: 'Failed to save data',
+      details: errorMessage 
+    }, { status: 500 })
   }
 }
 
