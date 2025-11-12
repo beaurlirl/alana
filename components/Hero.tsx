@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { getImageUrl } from '@/lib/image-url'
 
 interface HeroProps {
-  images?: Array<{ id: string; filename: string; title?: string; order: number }>
+  images?: Array<{ id: string; filename: string; title?: string; order: number; isHero?: boolean }>
 }
 
 interface ImageLayerProps {
@@ -60,9 +60,10 @@ export default function Hero({ images = [] }: HeroProps) {
     offset: ["start start", "end end"]
   })
 
-  // Use only first 4 images for hero scroll effect (prevents performance issues)
-  const heroImageLimit = 4
-  const sortedImages = [...images].sort((a, b) => a.order - b.order)
+  // Filter only images marked as hero/featured, then sort and limit
+  const heroImageLimit = 8
+  const heroImages = images.filter(img => img.isHero)
+  const sortedImages = [...heroImages].sort((a, b) => a.order - b.order)
   const limitedImages = sortedImages.slice(0, heroImageLimit)
   
   const displayImages = limitedImages.length > 0 ? limitedImages : [

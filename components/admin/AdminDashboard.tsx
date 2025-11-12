@@ -60,7 +60,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     }
   }
 
-  const handleImageUploaded = (filename: string) => {
+  const handleImageUploaded = (filename: string, category: string, collection: string) => {
     if (!data) return
 
     const newImage: PortfolioImage = {
@@ -69,12 +69,24 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       title: '',
       description: '',
       order: data.images.length,
+      category: category || undefined,
+      collection: collection || undefined,
     }
 
-    saveData({
-      ...data,
-      images: [...data.images, newImage],
-    })
+    // If a new collection was created during upload, add it to collections
+    const collections = data.collections || []
+    if (collection && category && !collections.some(c => c.name === collection && c.category === category)) {
+      saveData({
+        ...data,
+        images: [...data.images, newImage],
+        collections: [...collections, { name: collection, category }]
+      })
+    } else {
+      saveData({
+        ...data,
+        images: [...data.images, newImage],
+      })
+    }
   }
 
   const handleImagesReordered = (images: PortfolioImage[]) => {
@@ -313,10 +325,23 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           </div>
         </section>
 
+        {/* Hero Images Note */}
+        <section>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-900">
+              💡 <strong>Tip:</strong> Tag images as "Featured" in the Image Manager below to display them in the homepage hero scroll effect
+            </p>
+          </div>
+        </section>
+
         {/* Upload Section */}
         <section>
           <h2 className="font-migra text-3xl font-medium mb-6">Upload New Image</h2>
-          <ImageUploader onImageUploaded={handleImageUploaded} />
+          <ImageUploader 
+            onImageUploaded={handleImageUploaded}
+            categories={data.categories}
+            collections={data.collections || []}
+          />
         </section>
 
         {/* Image Management Section */}

@@ -129,6 +129,22 @@ export default function ImageManager({ images, categories, collections, onReorde
             <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
               #{image.order + 1}
             </div>
+            
+            {/* Hero/Featured Toggle */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onUpdate({ ...image, isHero: !image.isHero })
+              }}
+              className={`absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded transition-all ${
+                image.isHero 
+                  ? 'bg-yellow-500 text-white shadow-lg' 
+                  : 'bg-white/90 text-gray-700 hover:bg-white'
+              }`}
+              title={image.isHero ? 'Remove from homepage' : 'Feature on homepage'}
+            >
+              {image.isHero ? '⭐ Featured' : '☆ Feature'}
+            </button>
           </div>
 
           {/* Image Info */}

@@ -9,7 +9,8 @@ import { getImageUrl } from '@/lib/image-url'
 
 export default function Collections() {
   const [data, setData] = useState<PortfolioData | null>(null)
-  const [selectedCollection, setSelectedCollection] = useState<string>('All')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState<PortfolioImage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -57,16 +58,23 @@ export default function Collections() {
     )
   }
 
-  // Get all unique collections for filtering
-  const allCollections = ['All', ...data.categories, ...(data.collections || []).map(c => c.name)]
+  // Get collections for selected category
+  const categoryCollections = selectedCategory
+    ? (data.collections || []).filter(c => c.category === selectedCategory)
+    : []
   
-  const filteredImages = selectedCollection === 'All' 
-    ? data.images 
-    : data.categories.includes(selectedCollection)
-      ? data.images.filter(img => img.category === selectedCollection)
-      : data.images.filter(img => img.collection === selectedCollection)
+  // Get images based on selection
+  const getFilteredImages = () => {
+    if (selectedCollection) {
+      return data.images.filter(img => img.collection === selectedCollection)
+    }
+    if (selectedCategory) {
+      return data.images.filter(img => img.category === selectedCategory)
+    }
+    return []
+  }
 
-  const sortedImages = [...filteredImages].sort((a, b) => a.order - b.order)
+  const sortedImages = [...getFilteredImages()].sort((a, b) => a.order - b.order)
 
   return (
     <main className="min-h-screen pt-32 pb-20 px-6 md:px-12 lg:px-24">
@@ -75,102 +83,190 @@ export default function Collections() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
       >
-        <h1 className="font-migra text-4xl md:text-5xl lg:text-6xl font-medium mb-8">
+        <h1 className="font-migra text-4xl md:text-5xl lg:text-6xl font-medium mb-4">
           Collections
         </h1>
+        <p className="text-charcoal/60 mb-12">Select a category to view collections and photos</p>
 
-        {/* Collection Filters */}
-        <div className="space-y-4 mb-12">
-          {/* All button and Categories on same line */}
-          <div className="flex flex-wrap gap-3">
+        {/* STEP 1: Select Category */}
+        {!selectedCategory && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {data.categories.map((category) => {
+              const categoryImages = data.images.filter(img => img.category === category)
+              const firstImage = categoryImages[0]
+              const collectionCount = (data.collections || []).filter(c => c.category === category).length
+              
+              return (
+                <motion.button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="group text-left"
+                >
+                  <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden mb-4">
+                    {firstImage && (
+                      <Image
+                        src={getImageUrl(firstImage.filename)}
+                        alt={category}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                  <h3 className="font-migra text-2xl font-medium mb-1">{category}</h3>
+                  <p className="text-sm text-charcoal/60">
+                    {collectionCount} {collectionCount === 1 ? 'collection' : 'collections'} • {categoryImages.length} {categoryImages.length === 1 ? 'photo' : 'photos'}
+                  </p>
+                </motion.button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* STEP 2: View Collections OR All Category Images */}
+        {selectedCategory && !selectedCollection && (
+          <div>
             <button
-              onClick={() => setSelectedCollection('All')}
-              className={`px-4 py-2 text-sm transition-all ${
-                selectedCollection === 'All'
-                  ? 'bg-charcoal text-cream'
-                  : 'bg-transparent border border-charcoal/20 hover:border-charcoal/40'
-              }`}
+              onClick={() => setSelectedCategory(null)}
+              className="flex items-center gap-2 text-sm text-charcoal/60 hover:text-charcoal mb-8 transition-colors"
             >
-              All
+              ← Back to categories
             </button>
 
-            {/* Categories */}
-            {data.categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCollection(category)}
-                className={`px-4 py-2 text-sm font-medium transition-all ${
-                  selectedCollection === category
-                    ? 'bg-charcoal text-cream'
-                    : 'bg-transparent border border-charcoal/20 hover:border-charcoal/40'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+            <h2 className="font-migra text-3xl font-medium mb-2">{selectedCategory}</h2>
+            <p className="text-charcoal/60 mb-8">
+              {categoryCollections.length > 0 
+                ? 'Select a collection to view specific photos' 
+                : 'Viewing all photos in this category'
+              }
+            </p>
 
-          {/* Collections under each category */}
-          {data.categories.map((category) => {
-            const categoryCollections = (data.collections || []).filter(c => c.category === category)
-            if (categoryCollections.length === 0) return null
-            
-            return (
-              <div key={`${category}-collections`} className="flex flex-wrap gap-2 ml-6">
-                {categoryCollections.map((collection) => (
-                  <button
-                    key={collection.name}
-                    onClick={() => setSelectedCollection(collection.name)}
-                    className={`px-3 py-1.5 text-sm transition-all ${
-                      selectedCollection === collection.name
-                        ? 'bg-charcoal/80 text-cream'
-                        : 'bg-charcoal/10 hover:bg-charcoal/20'
-                    }`}
+            {/* Collections Grid */}
+            {categoryCollections.length > 0 ? (
+              <>
+                {/* Option to view all in category */}
+                <button
+                  onClick={() => setSelectedCollection('__VIEW_ALL__')}
+                  className="px-4 py-2 mb-8 text-sm bg-charcoal/10 hover:bg-charcoal/20 transition-colors"
+                >
+                  View all {selectedCategory} photos
+                </button>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {categoryCollections.map((collection) => {
+                    const collectionImages = data.images.filter(img => img.collection === collection.name)
+                    const firstImage = collectionImages[0]
+                    
+                    return (
+                      <motion.button
+                        key={collection.name}
+                        onClick={() => setSelectedCollection(collection.name)}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="group text-left"
+                      >
+                        <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden mb-4">
+                          {firstImage && (
+                            <Image
+                              src={getImageUrl(firstImage.filename)}
+                              alt={collection.name}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                        <h3 className="font-medium text-lg mb-1">{collection.name}</h3>
+                        <p className="text-sm text-charcoal/60">
+                          {collectionImages.length} {collectionImages.length === 1 ? 'photo' : 'photos'}
+                        </p>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+              </>
+            ) : (
+              // If no collections, show all category images
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {sortedImages.map((image, index) => (
+                  <motion.div
+                    key={image.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.05 }}
+                    className="relative aspect-[3/4] bg-gray-100 overflow-hidden group cursor-pointer"
+                    onClick={() => setSelectedImage(image)}
                   >
-                    {collection.name}
-                  </button>
+                    <Image
+                      src={getImageUrl(image.filename)}
+                      alt={image.title || 'Portfolio image'}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                    {image.title && (
+                      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 className="text-white font-medium text-sm">{image.title}</h3>
+                      </div>
+                    )}
+                  </motion.div>
                 ))}
               </div>
-            )
-          })}
-        </div>
-
-        {/* Images Grid */}
-        {sortedImages.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            <p>No images in this collection yet.</p>
+            )}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {sortedImages.map((image, index) => (
-              <motion.div
-                key={image.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="relative aspect-[3/4] bg-gray-100 overflow-hidden group cursor-pointer"
-                onClick={() => setSelectedImage(image)}
-              >
-                <Image
-                  src={getImageUrl(image.filename)}
-                  alt={image.title || 'Portfolio image'}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                />
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                
-                {image.title && (
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <h3 className="text-white font-medium text-sm">
-                      {image.title}
-                    </h3>
-                  </div>
-                )}
-              </motion.div>
-            ))}
+        )}
+
+        {/* STEP 3: View Collection Images */}
+        {selectedCollection && (
+          <div>
+            <button
+              onClick={() => setSelectedCollection(null)}
+              className="flex items-center gap-2 text-sm text-charcoal/60 hover:text-charcoal mb-8 transition-colors"
+            >
+              ← Back to {selectedCategory} collections
+            </button>
+
+            {selectedCollection !== '__VIEW_ALL__' && (
+              <h2 className="font-migra text-3xl font-medium mb-8">{selectedCollection}</h2>
+            )}
+
+            {sortedImages.length === 0 ? (
+              <div className="text-center py-20 text-gray-400">
+                <p>No images in this collection yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {sortedImages.map((image, index) => (
+                  <motion.div
+                    key={image.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.05 }}
+                    className="relative aspect-[3/4] bg-gray-100 overflow-hidden group cursor-pointer"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <Image
+                      src={getImageUrl(image.filename)}
+                      alt={image.title || 'Portfolio image'}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                    {image.title && (
+                      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h3 className="text-white font-medium text-sm">{image.title}</h3>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </motion.div>

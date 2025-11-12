@@ -8,6 +8,7 @@ export interface PortfolioImage {
   order: number
   category?: string
   collection?: string
+  isHero?: boolean
 }
 
 export interface Collection {
