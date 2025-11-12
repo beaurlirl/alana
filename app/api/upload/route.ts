@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
-import { validateImageFile } from '@/lib/validation'
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
@@ -20,13 +19,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validate file
-    const validation = validateImageFile(file)
-    if (!validation.valid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 })
+    // Basic validation
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'Please upload an image file' }, { status: 400 })
     }
 
-    // Generate unique filename with sanitization
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 })
+    }
+
+    // Generate unique filename
     const timestamp = Date.now()
     const sanitizedName = file.name
       .replace(/\s+/g, '-')
@@ -34,29 +36,14 @@ export async function POST(request: NextRequest) {
       .toLowerCase()
     const filename = `${timestamp}-${sanitizedName}`
 
-    // Prevent path traversal
-    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
-      return NextResponse.json({ error: 'Invalid filename' }, { status: 400 })
-    }
-
-    // Check if BLOB_READ_WRITE_TOKEN is set
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return NextResponse.json({ 
-        error: 'Vercel Blob is not configured. Please set BLOB_READ_WRITE_TOKEN in your environment variables.',
-        details: 'See VERCEL_BLOB_SETUP.md for instructions'
-      }, { status: 500 })
-    }
-
-    // Upload to Vercel Blob
+    // Upload to Vercel Blob (included in your Pro plan!)
     const blob = await put(filename, file, {
       access: 'public',
-      addRandomSuffix: false,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
     })
 
     return NextResponse.json({ 
       success: true, 
-      filename: blob.url, // Store the full Vercel Blob URL
+      filename: blob.url,
       url: blob.url
     })
   } catch (error) {

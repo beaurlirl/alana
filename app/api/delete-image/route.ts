@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { del } from '@vercel/blob'
-import { deleteImageSchema } from '@/lib/validation'
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
@@ -14,29 +13,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
+    const { filename } = body
     
-    // Validate input
-    const validationResult = deleteImageSchema.safeParse(body)
-    if (!validationResult.success) {
-      return NextResponse.json(
-        { 
-          error: 'Validation error',
-          details: validationResult.error.flatten().fieldErrors,
-        }, 
-        { status: 400 }
-      )
+    if (!filename) {
+      return NextResponse.json({ error: 'No filename provided' }, { status: 400 })
     }
 
-    const { filename } = validationResult.data
-    
     // Delete from Vercel Blob
-    // filename is now a full URL from Vercel Blob
     try {
       await del(filename)
       return NextResponse.json({ success: true })
     } catch (error) {
       // File might not exist, that's okay
-      console.error('Delete error (non-critical):', error)
+      console.log('Delete error (file may not exist):', error)
       return NextResponse.json({ success: true })
     }
   } catch (error) {
@@ -44,7 +33,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to delete file' }, { status: 500 })
   }
 }
-
-// Configure runtime for Vercel
-export const runtime = 'edge'
 

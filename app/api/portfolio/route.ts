@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPortfolioData, savePortfolioData } from '@/lib/data'
-import { portfolioDataSchema } from '@/lib/validation'
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
@@ -23,30 +22,35 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json()
+    const data = await request.json()
     
-    // Validate portfolio data with detailed error logging
-    const validationResult = portfolioDataSchema.safeParse(body)
-    if (!validationResult.success) {
-      console.error('Validation failed:', validationResult.error.flatten())
-      return NextResponse.json(
-        { 
-          error: 'Validation error',
-          details: validationResult.error.flatten().fieldErrors,
-          message: 'Please check the data format and try again'
-        }, 
-        { status: 400 }
-      )
+    // Simple validation - just check it's an object with required fields
+    if (!data || typeof data !== 'object') {
+      return NextResponse.json({ error: 'Invalid data format' }, { status: 400 })
+    }
+    
+    // Ensure images array exists
+    if (!Array.isArray(data.images)) {
+      data.images = []
+    }
+    
+    // Ensure collections array exists  
+    if (!Array.isArray(data.collections)) {
+      data.collections = []
+    }
+    
+    // Ensure categories array exists
+    if (!Array.isArray(data.categories)) {
+      data.categories = ['Editorial', 'Commercial', 'Runway']
     }
 
-    await savePortfolioData(validationResult.data)
+    await savePortfolioData(data)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Portfolio POST error:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json({ 
       error: 'Failed to save data',
-      details: errorMessage 
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
