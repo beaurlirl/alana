@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PortfolioImage } from '@/lib/data'
+import { getImageUrl } from '@/lib/image-url'
 
 interface LightboxProps {
   image: PortfolioImage
@@ -40,11 +41,15 @@ export default function Lightbox({ image, onClose, allImages, onNavigate }: Ligh
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image gallery lightbox"
     >
       {/* Close Button */}
       <button
         onClick={onClose}
         className="absolute top-6 right-6 text-white hover:opacity-60 transition-opacity z-10"
+        aria-label="Close lightbox"
       >
         <svg
           className="w-8 h-8"
@@ -69,6 +74,7 @@ export default function Lightbox({ image, onClose, allImages, onNavigate }: Ligh
             onNavigate(allImages[currentIndex - 1])
           }}
           className="absolute left-6 text-white hover:opacity-60 transition-opacity z-10"
+          aria-label="Previous image"
         >
           <svg
             className="w-12 h-12"
@@ -93,6 +99,7 @@ export default function Lightbox({ image, onClose, allImages, onNavigate }: Ligh
             onNavigate(allImages[currentIndex + 1])
           }}
           className="absolute right-6 text-white hover:opacity-60 transition-opacity z-10"
+          aria-label="Next image"
         >
           <svg
             className="w-12 h-12"
@@ -119,7 +126,7 @@ export default function Lightbox({ image, onClose, allImages, onNavigate }: Ligh
         onClick={(e) => e.stopPropagation()}
       >
         <Image
-          src={`/uploads/${image.filename}`}
+          src={getImageUrl(image.filename)}
           alt={image.title || 'Portfolio image'}
           fill
           className="object-contain"
@@ -148,8 +155,12 @@ export default function Lightbox({ image, onClose, allImages, onNavigate }: Ligh
       )}
 
       {/* Counter */}
-      <div className="absolute top-6 left-6 text-white text-sm">
-        {currentIndex + 1} / {allImages.length}
+      <div 
+        className="absolute top-6 left-6 text-white text-sm"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        Image {currentIndex + 1} of {allImages.length}
       </div>
     </motion.div>
   )

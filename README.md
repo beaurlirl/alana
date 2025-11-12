@@ -207,6 +207,22 @@ The current fonts are:
 
 To change fonts, edit `app/layout.tsx` and `tailwind.config.ts`.
 
+## 🚀 Vercel Deployment - IMPORTANT
+
+### Can't Access Admin on Live Site?
+
+If you deployed to Vercel but can't access `/admin`, you need to set environment variables:
+
+1. **Go to Vercel Dashboard** → Your Project → Settings → Environment Variables
+2. **Add these variables:**
+   - `ADMIN_PASSWORD` = Your secure password
+   - `NEXT_PUBLIC_SITE_URL` = Your production URL
+3. **Redeploy your site** (required after adding env vars)
+
+**📖 See `VERCEL_SETUP.md` for detailed instructions!**
+
+---
+
 ## 🔧 Troubleshooting
 
 ### Images Not Showing

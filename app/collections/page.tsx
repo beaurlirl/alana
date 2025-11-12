@@ -1,13 +1,16 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { PortfolioImage, PortfolioData, Collection } from '@/lib/data'
+import Lightbox from '@/components/Lightbox'
+import { getImageUrl } from '@/lib/image-url'
 
 export default function Collections() {
   const [data, setData] = useState<PortfolioData | null>(null)
   const [selectedCollection, setSelectedCollection] = useState<string>('All')
+  const [selectedImage, setSelectedImage] = useState<PortfolioImage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -28,8 +31,20 @@ export default function Collections() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-charcoal"></div>
+      <main className="min-h-screen pt-32 pb-20 px-6 md:px-12 lg:px-24">
+        <div className="h-12 w-64 bg-gray-200 rounded mb-8 animate-pulse"></div>
+        
+        <div className="flex flex-wrap gap-3 mb-12">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+          ))}
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="aspect-[3/4] bg-gray-200 rounded animate-pulse"></div>
+          ))}
+        </div>
       </main>
     )
   }
@@ -134,9 +149,10 @@ export default function Collections() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 className="relative aspect-[3/4] bg-gray-100 overflow-hidden group cursor-pointer"
+                onClick={() => setSelectedImage(image)}
               >
                 <Image
-                  src={`/uploads/${image.filename}`}
+                  src={getImageUrl(image.filename)}
                   alt={image.title || 'Portfolio image'}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -158,6 +174,18 @@ export default function Collections() {
           </div>
         )}
       </motion.div>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {selectedImage && (
+          <Lightbox
+            image={selectedImage}
+            onClose={() => setSelectedImage(null)}
+            allImages={sortedImages}
+            onNavigate={setSelectedImage}
+          />
+        )}
+      </AnimatePresence>
     </main>
   )
 }

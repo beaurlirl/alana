@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { PortfolioImage } from '@/lib/data'
-
+import { getImageUrl } from '@/lib/image-url'
 import { Collection } from '@/lib/data'
 
 interface ImageManagerProps {
@@ -120,7 +120,7 @@ export default function ImageManager({ images, categories, collections, onReorde
           {/* Image Preview */}
           <div className="relative aspect-[3/4] bg-gray-100">
             <Image
-              src={`/uploads/${image.filename}`}
+              src={getImageUrl(image.filename)}
               alt={image.title || 'Portfolio image'}
               fill
               className="object-cover"

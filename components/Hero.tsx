@@ -3,9 +3,10 @@
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
+import { getImageUrl } from '@/lib/image-url'
 
 interface HeroProps {
-  images?: Array<{ id: string; filename: string; title?: string }>
+  images?: Array<{ id: string; filename: string; title?: string; order: number }>
 }
 
 interface ImageLayerProps {
@@ -36,7 +37,7 @@ function ImageLayer({ image, index, scrollYProgress, startProgress, endProgress 
     >
       {image.filename ? (
         <Image
-          src={`/uploads/${image.filename}`}
+          src={getImageUrl(image.filename)}
           alt={image.title || 'Portfolio image'}
           fill
           className="object-cover"
@@ -59,8 +60,12 @@ export default function Hero({ images = [] }: HeroProps) {
     offset: ["start start", "end end"]
   })
 
-  // Use all images or create placeholders
-  const displayImages = images.length > 0 ? images : [
+  // Use only first 4 images for hero scroll effect (prevents performance issues)
+  const heroImageLimit = 4
+  const sortedImages = [...images].sort((a, b) => a.order - b.order)
+  const limitedImages = sortedImages.slice(0, heroImageLimit)
+  
+  const displayImages = limitedImages.length > 0 ? limitedImages : [
     { id: '1', filename: '', title: 'Image 1' },
     { id: '2', filename: '', title: 'Image 2' },
     { id: '3', filename: '', title: 'Image 3' },
@@ -71,7 +76,12 @@ export default function Hero({ images = [] }: HeroProps) {
   const sectionHeight = `${displayImages.length * 100}vh`
 
   return (
-    <section ref={sectionRef} className="relative" style={{ minHeight: sectionHeight }}>
+    <section 
+      ref={sectionRef} 
+      className="relative" 
+      style={{ minHeight: sectionHeight }}
+      aria-label="Hero section with scroll-triggered images"
+    >
       <div className="sticky top-0 h-screen flex items-center px-6 md:px-12 lg:px-24 py-20">
         <div className="max-w-screen-2xl w-full mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">

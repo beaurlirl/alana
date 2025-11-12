@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import path from 'path'
-import { ensureUploadsDirectory } from '@/lib/data'
+import { put } from '@vercel/blob'
+import { validateImageFile } from '@/lib/validation'
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
@@ -21,29 +20,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Ensure uploads directory exists
-    await ensureUploadsDirectory()
+    // Validate file
+    const validation = validateImageFile(file)
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
 
-    // Generate unique filename
+    // Generate unique filename with sanitization
     const timestamp = Date.now()
-    const originalName = file.name.replace(/\s+/g, '-')
-    const filename = `${timestamp}-${originalName}`
+    const sanitizedName = file.name
+      .replace(/\s+/g, '-')
+      .replace(/[^a-zA-Z0-9.-]/g, '')
+      .toLowerCase()
+    const filename = `${timestamp}-${sanitizedName}`
 
-    // Convert file to buffer and save
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    
-    const filepath = path.join(process.cwd(), 'public', 'uploads', filename)
-    await writeFile(filepath, buffer)
+    // Prevent path traversal
+    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return NextResponse.json({ error: 'Invalid filename' }, { status: 400 })
+    }
+
+    // Upload to Vercel Blob
+    const blob = await put(filename, file, {
+      access: 'public',
+      addRandomSuffix: false,
+    })
 
     return NextResponse.json({ 
       success: true, 
-      filename,
-      url: `/uploads/${filename}`
+      filename: blob.url, // Store the full Vercel Blob URL
+      url: blob.url
     })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
   }
 }
+
+// Configure runtime for Vercel
+export const runtime = 'edge'
 

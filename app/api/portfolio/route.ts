@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPortfolioData, savePortfolioData } from '@/lib/data'
+import { portfolioDataSchema } from '@/lib/validation'
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
@@ -11,6 +12,7 @@ export async function GET() {
     const data = await getPortfolioData()
     return NextResponse.json(data)
   } catch (error) {
+    console.error('Portfolio GET error:', error)
     return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 })
   }
 }
@@ -21,10 +23,24 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const data = await request.json()
-    await savePortfolioData(data)
+    const body = await request.json()
+    
+    // Validate portfolio data
+    const validationResult = portfolioDataSchema.safeParse(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { 
+          error: 'Validation error',
+          details: validationResult.error.flatten().fieldErrors,
+        }, 
+        { status: 400 }
+      )
+    }
+
+    await savePortfolioData(validationResult.data)
     return NextResponse.json({ success: true })
   } catch (error) {
+    console.error('Portfolio POST error:', error)
     return NextResponse.json({ error: 'Failed to save data' }, { status: 500 })
   }
 }

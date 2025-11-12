@@ -53,7 +53,13 @@ export default function AdminPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-charcoal"></div>
+        <div className="text-center space-y-4">
+          <div className="relative w-16 h-16 mx-auto">
+            <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-charcoal border-t-transparent animate-spin"></div>
+          </div>
+          <p className="text-sm text-gray-600 animate-pulse">Loading admin panel...</p>
+        </div>
       </div>
     )
   }

@@ -146,8 +146,37 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-charcoal"></div>
+      <div className="min-h-screen bg-cream">
+        <header className="bg-cream shadow-sm sticky top-0 z-10">
+          <div className="max-w-screen-2xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </header>
+
+        <main className="max-w-screen-2xl mx-auto px-6 md:px-12 py-12 space-y-12">
+          <section>
+            <div className="h-10 w-64 bg-gray-200 rounded mb-6 animate-pulse"></div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <div className="h-48 bg-gray-100 rounded animate-pulse"></div>
+            </div>
+          </section>
+
+          <section>
+            <div className="h-10 w-64 bg-gray-200 rounded mb-6 animate-pulse"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-cream rounded-lg overflow-hidden shadow-md">
+                  <div className="aspect-[3/4] bg-gray-200 animate-pulse"></div>
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
       </div>
     )
   }

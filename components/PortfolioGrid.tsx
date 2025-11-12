@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PortfolioImage } from '@/lib/data'
 import Lightbox from './Lightbox'
+import { getImageUrl } from '@/lib/image-url'
 
 interface PortfolioGridProps {
   images: PortfolioImage[]
@@ -17,7 +18,11 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
 
   return (
     <>
-      <section id="portfolio" className="min-h-screen px-6 md:px-12 lg:px-24 py-20">
+      <section 
+        id="portfolio" 
+        className="min-h-screen px-6 md:px-12 lg:px-24 py-20"
+        aria-label="Portfolio gallery"
+      >
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -34,7 +39,10 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
               <p>No images yet. Add some from the admin panel.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              role="list"
+            >
               {sortedImages.map((image, index) => (
                 <motion.div
                   key={image.id}
@@ -44,9 +52,18 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="group relative aspect-[3/4] bg-gray-100 overflow-hidden cursor-pointer"
                   onClick={() => setSelectedImage(image)}
+                  role="listitem"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelectedImage(image)
+                    }
+                  }}
+                  aria-label={`View ${image.title || 'portfolio image'} in lightbox`}
                 >
                   <Image
-                    src={`/uploads/${image.filename}`}
+                    src={getImageUrl(image.filename)}
                     alt={image.title || 'Portfolio image'}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
