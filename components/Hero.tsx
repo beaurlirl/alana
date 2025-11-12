@@ -97,8 +97,8 @@ export default function Hero({ images = [] }: HeroProps) {
                 Model
               </p>
 
-              {/* Measurements */}
-              <div className="space-y-2 text-sm md:text-base">
+              {/* Measurements - Two columns on mobile, single column on desktop */}
+              <div className="grid grid-cols-2 md:block gap-x-4 gap-y-2 md:space-y-2 text-sm md:text-base">
                 <p><span className="opacity-60">Height:</span> [Your Height]</p>
                 <p><span className="opacity-60">Bust:</span> [Measurement]</p>
                 <p><span className="opacity-60">Waist:</span> [Measurement]</p>
