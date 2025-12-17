@@ -201,34 +201,14 @@ function Navigation() {
               ))}
             </ul>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Menu Button - Migra font */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden relative z-50 w-12 h-12 flex flex-col items-center justify-center gap-1.5 rounded-full transition-colors duration-400 ease-prestige hover:bg-charcoal/5"
+              className="md:hidden relative z-50 px-3 py-2 font-migra text-sm tracking-wider transition-colors duration-400 ease-prestige hover:text-accent"
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
             >
-              <span
-                className="h-0.5 bg-charcoal origin-center transition-transform duration-400 ease-prestige gpu"
-                style={{ 
-                  width: 24,
-                  transform: isMobileMenuOpen ? 'rotate(45deg) translateY(7px)' : 'rotate(0) translateY(0)'
-                }}
-              />
-              <span
-                className="w-6 h-0.5 bg-charcoal transition-all duration-400 ease-prestige gpu"
-                style={{ 
-                  opacity: isMobileMenuOpen ? 0 : 1,
-                  transform: isMobileMenuOpen ? 'scaleX(0)' : 'scaleX(1)'
-                }}
-              />
-              <span
-                className="h-0.5 bg-charcoal origin-center transition-transform duration-400 ease-prestige gpu"
-                style={{ 
-                  width: 24,
-                  transform: isMobileMenuOpen ? 'rotate(-45deg) translateY(-7px)' : 'rotate(0) translateY(0)'
-                }}
-              />
+              {isMobileMenuOpen ? 'CLOSE' : 'MENU'}
             </button>
           </div>
         </div>

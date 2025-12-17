@@ -275,8 +275,8 @@ function Hero({ images = [] }: HeroProps) {
           </motion.div>
         </div>
 
-        {/* Right Panel - Category Image - centered more */}
-        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden md:-mt-[5vh] md:pr-[5%] lg:pr-[8%]">
+        {/* Right Panel - Category Image - moved up on mobile */}
+        <div className="flex-1 flex flex-col items-center justify-start relative overflow-hidden -mt-[15vh] md:-mt-[5vh] md:pr-[5%] lg:pr-[8%]">
           {/* Decorative vertical line - desktop */}
           <motion.div
             className="hidden md:block absolute right-[3%] lg:right-[5%] top-0 bottom-0 w-px bg-charcoal/10"
@@ -286,8 +286,8 @@ function Hero({ images = [] }: HeroProps) {
             style={{ transformOrigin: 'top' }}
           />
 
-          {/* Category Image & Label - BIGGER, more centered */}
-          <div className="w-full h-full flex flex-col items-center justify-center relative px-4 md:px-0">
+          {/* Category Image & Label - 3X BIGGER on mobile */}
+          <div className="w-full h-full flex flex-col items-center justify-start relative px-2 md:px-0">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div 
                 key={currentCategory.name}
@@ -299,39 +299,39 @@ function Hero({ images = [] }: HeroProps) {
                   ease: [0.32, 0.72, 0, 1],
                   opacity: { duration: 0.4 }
                 }}
-                className="w-full h-full flex flex-col items-center justify-center"
+                className="w-full h-full flex flex-col items-center justify-start md:justify-center"
               >
                 <Link
                   href={`/collections?category=${encodeURIComponent(currentCategory.category)}`}
-                  className="group flex flex-col items-center w-full h-full justify-center"
+                  className="group flex flex-col items-center w-full h-full justify-start md:justify-center"
                 >
-                  {/* Image container - BIGGER, more centered */}
+                  {/* Image container - 3X BIGGER on mobile */}
                   <motion.div 
-                    className="relative w-full max-w-[85vw] md:max-w-[45vw] lg:max-w-[40vw]"
+                    className="relative w-full max-w-[100vw] md:max-w-[45vw] lg:max-w-[40vw]"
                     style={{ 
                       x: imageX, 
                       y: imageY,
-                      height: '75vh',
-                      maxHeight: '75vh'
                     }}
                   >
-                    <Image
-                      src={currentCategory.image}
-                      alt={currentCategory.name}
-                      fill
-                      className="object-contain object-center transition-transform duration-700 ease-out-quint group-hover:scale-[1.01]"
-                      sizes="(max-width: 768px) 85vw, 50vw"
-                      priority
-                    />
+                    <div className="relative w-full h-[85vh] md:h-[75vh]">
+                      <Image
+                        src={currentCategory.image}
+                        alt={currentCategory.name}
+                        fill
+                        className="object-contain object-top md:object-center transition-transform duration-700 ease-out-quint group-hover:scale-[1.01]"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority
+                      />
+                    </div>
                   </motion.div>
 
-                  {/* Category name - BIGGER */}
+                  {/* Category name - positioned higher on mobile */}
                   <motion.h2 
-                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center py-4 md:py-6 shrink-0"
+                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center py-2 md:py-6 shrink-0 -mt-[10vh] md:mt-0"
                     initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15, duration: 0.4 }}
-                >
+                  >
                     {currentCategory.name}
                   </motion.h2>
                 </Link>

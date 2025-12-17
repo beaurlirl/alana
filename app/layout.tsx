@@ -27,11 +27,20 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     siteName: 'Alana Cavanzo Portfolio',
+    images: [
+      {
+        url: '/alanawordmark.png',
+        width: 320,
+        height: 80,
+        alt: 'Alana Cavanzo',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Alana Cavanzo - Model Portfolio',
     description: 'Professional model portfolio featuring editorial, commercial, and runway work.',
+    images: ['/alanawordmark.png'],
   },
   robots: {
     index: true,
