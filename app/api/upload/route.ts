@@ -4,13 +4,10 @@ import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { validateImageFile } from '@/lib/validation'
 
-// Allow larger uploads (50MB)
-export const config = {
-  api: {
-    bodyParser: false,
-    responseLimit: '50mb',
-  },
-}
+// Route segment config for larger uploads
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
