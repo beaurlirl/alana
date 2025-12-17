@@ -33,9 +33,9 @@ export default function ImageUploader({ onImageUploaded, categories, collections
       return
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be less than 10MB')
+    // Validate file size (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      setError('File size must be less than 50MB')
       return
     }
 
@@ -142,7 +142,7 @@ export default function ImageUploader({ onImageUploaded, categories, collections
                   or click to select a file
                 </p>
                 <p className="text-xs text-gray-400 mt-2">
-                  Supports: JPG, PNG, GIF, WebP (max 10MB)
+                  Supports: JPG, PNG, GIF, WebP (max 50MB)
                 </p>
               </div>
             </div>

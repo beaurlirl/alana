@@ -5,26 +5,54 @@
       "filename": "1762416495440-image00001.jpeg",
       "title": "",
       "description": "",
-      "order": 0
+      "order": 0,
+      "category": "Editorial",
+      "collection": "",
+      "isHero": true
     },
     {
       "id": "1762416508350",
       "filename": "1762416508337-image00026.jpeg",
       "title": "",
       "description": "",
-      "order": 1
+      "order": 1,
+      "category": "Editorial",
+      "collection": "",
+      "isHero": true
     },
     {
       "id": "1762416519349",
       "filename": "1762416519340-image00013.jpeg",
       "title": "",
       "description": "",
-      "order": 2
+      "order": 2,
+      "category": "Editorial",
+      "collection": "",
+      "isHero": true
+    },
+    {
+      "id": "1766008461161",
+      "filename": "1766008454837-image00092.jpeg",
+      "title": "",
+      "description": "",
+      "order": 3,
+      "category": "Editorial",
+      "collection": "Summer 2024",
+      "isHero": false
     }
   ],
   "heroImage": "",
-  "modelName": "Alana Cabanzo",
+  "modelName": "Alana Cavanzo",
   "heroTagline": "Model",
-  "categories": ["Editorial", "Commercial", "Runway"],
-  "collections": []
+  "categories": [
+    "Editorial",
+    "Commercial",
+    "Runway"
+  ],
+  "collections": [
+    {
+      "name": "Summer 2024",
+      "category": "Editorial"
+    }
+  ]
 }

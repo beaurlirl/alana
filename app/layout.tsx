@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
+import IntroScreen from '@/components/IntroScreen'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -16,20 +17,20 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Alana Cabanzo - Model Portfolio',
+  title: 'Alana Cavanzo - Model Portfolio',
   description: 'Professional model portfolio featuring editorial, commercial, and runway work. Browse collections and contact for bookings.',
   keywords: ['model', 'portfolio', 'fashion', 'editorial', 'commercial', 'runway'],
-  authors: [{ name: 'Alana Cabanzo' }],
+  authors: [{ name: 'Alana Cavanzo' }],
   openGraph: {
-    title: 'Alana Cabanzo - Model Portfolio',
+    title: 'Alana Cavanzo - Model Portfolio',
     description: 'Professional model portfolio featuring editorial, commercial, and runway work.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'Alana Cabanzo Portfolio',
+    siteName: 'Alana Cavanzo Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alana Cabanzo - Model Portfolio',
+    title: 'Alana Cavanzo - Model Portfolio',
     description: 'Professional model portfolio featuring editorial, commercial, and runway work.',
   },
   robots: {
@@ -62,25 +63,27 @@ export default function RootLayout({
           Skip to main content
         </a>
         
-        {/* Animated background gradient */}
+        {/* Animated background gradient - serene mint */}
         <div 
           className="fixed inset-0 pointer-events-none -z-10"
           style={{
             background: `
-              radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 155, 138, 0.08), transparent),
-              radial-gradient(ellipse 60% 40% at 80% 60%, rgba(196, 169, 98, 0.05), transparent),
-              linear-gradient(180deg, #FAF8F3 0%, #F5F2EB 100%)
+              radial-gradient(ellipse 80% 50% at 20% 40%, rgba(157, 180, 160, 0.06), transparent),
+              radial-gradient(ellipse 60% 40% at 80% 60%, rgba(194, 212, 197, 0.04), transparent),
+              linear-gradient(180deg, #FAFBF9 0%, #F5F7F4 100%)
             `,
           }}
         />
         
-        <Navigation />
-        <main id="main-content">
-          {children}
-        </main>
+        <IntroScreen>
+          <Navigation />
+          <div id="main-content">
+            {children}
+          </div>
 
-        {/* Footer accent line */}
-        <div className="fixed bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-charcoal/5 to-transparent pointer-events-none" />
+          {/* Footer accent line */}
+          <div className="fixed bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-charcoal/5 to-transparent pointer-events-none" />
+        </IntroScreen>
       </body>
     </html>
   )

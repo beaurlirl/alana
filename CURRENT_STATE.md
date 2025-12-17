@@ -185,7 +185,7 @@
     }
   ],
   categories: ["Editorial", "Commercial", "Runway"],
-  modelName: "Alana Cabanzo",
+  modelName: "Alana Cavanzo",
   heroTagline: "Model"
 }
 ```
@@ -395,7 +395,7 @@ await fetch('/api/portfolio', {
     images: [],
     collections: [],
     categories: ['Editorial', 'Commercial', 'Runway'],
-    modelName: 'Alana Cabanzo',
+    modelName: 'Alana Cavanzo',
     heroTagline: 'Model'
   })
 })

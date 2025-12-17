@@ -1,59 +1,72 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, memo, useCallback } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { PortfolioImage } from '@/lib/data'
 import Lightbox from './Lightbox'
 import { getImageUrl } from '@/lib/image-url'
 
+// Prestige transition config
+const prestigeTransition = {
+  duration: 0.4,
+  ease: [0.4, 0, 0.2, 1]
+}
+
 interface PortfolioGridProps {
   images: PortfolioImage[]
 }
 
-// Individual image card with enhanced animations
-function ImageCard({ 
+// Memoized image card with GPU-optimized animations
+const ImageCard = memo(function ImageCard({ 
   image, 
   index, 
   onClick 
 }: { 
-  image: PortfolioImage; 
-  index: number; 
+  image: PortfolioImage
+  index: number
   onClick: () => void 
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(cardRef, { once: true, margin: "-50px" })
   const [isHovered, setIsHovered] = useState(false)
 
+  const handleMouseEnter = useCallback(() => setIsHovered(true), [])
+  const handleMouseLeave = useCallback(() => setIsHovered(false), [])
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onClick()
+    }
+  }, [onClick])
+
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 60, scale: 0.95 }}
-      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 60, scale: 0.95 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
       transition={{ 
-        duration: 0.7, 
+        ...prestigeTransition,
         delay: (index % 6) * 0.1,
-        ease: [0.22, 1, 0.36, 1]
       }}
-      className="group relative aspect-[3/4] bg-cream-dark overflow-hidden cursor-pointer"
+      className="group relative aspect-[3/4] bg-cream-dark overflow-hidden cursor-pointer gpu"
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       role="listitem"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onClick()
-        }
-      }}
+      onKeyDown={handleKeyDown}
       aria-label={`View ${image.title || 'portfolio image'} in lightbox`}
+      style={{ 
+        willChange: isHovered ? 'transform' : 'auto',
+      }}
     >
-      {/* Image with zoom effect */}
-      <motion.div
-        className="absolute inset-0"
-        animate={{ scale: isHovered ? 1.08 : 1 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      {/* Image with zoom effect - GPU optimized */}
+      <div
+        className="absolute inset-0 transition-transform duration-400 ease-prestige gpu"
+        style={{
+          transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+        }}
       >
         <Image
           src={getImageUrl(image.filename)}
@@ -61,54 +74,56 @@ function ImageCard({
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          loading="lazy"
         />
-      </motion.div>
+      </div>
       
-      {/* Gradient overlay */}
-      <motion.div 
-        className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-charcoal/10 to-transparent"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.4 }}
+      {/* Gradient overlay - opacity only transition */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-charcoal/10 to-transparent transition-opacity duration-400 ease-prestige"
+        style={{ opacity: isHovered ? 1 : 0 }}
       />
 
-      {/* Shine effect on hover */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent"
-        initial={{ x: '-100%', y: '-100%' }}
-        animate={{ x: isHovered ? '100%' : '-100%', y: isHovered ? '100%' : '-100%' }}
-        transition={{ duration: 0.8, ease: 'easeInOut' }}
+      {/* Shine effect on hover - transform only */}
+      <div
+        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent transition-transform duration-600 ease-prestige gpu"
+        style={{
+          transform: isHovered ? 'translateX(100%) translateY(100%)' : 'translateX(-100%) translateY(-100%)',
+        }}
       />
       
-      {/* Corner frame on hover */}
-      <motion.div
-        className="absolute inset-4 border border-white/30 pointer-events-none"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.9 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      {/* Corner frame on hover - opacity and scale */}
+      <div
+        className="absolute inset-4 border border-white/30 pointer-events-none transition-all duration-400 ease-prestige gpu"
+        style={{ 
+          opacity: isHovered ? 1 : 0,
+          transform: isHovered ? 'scale(1)' : 'scale(0.95)',
+        }}
       />
 
       {/* View indicator */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.5 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-400 ease-prestige gpu"
+        style={{ 
+          opacity: isHovered ? 1 : 0,
+          transform: `translate(-50%, -50%) scale(${isHovered ? 1 : 0.8})`,
+        }}
       >
         <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
           <svg className="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
           </svg>
         </div>
-      </motion.div>
+      </div>
       
       {/* Info overlay */}
       {(image.title || image.description) && (
-        <motion.div 
-          className="absolute bottom-0 left-0 right-0 p-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        <div 
+          className="absolute bottom-0 left-0 right-0 p-6 transition-all duration-400 ease-prestige"
+          style={{ 
+            opacity: isHovered ? 1 : 0,
+            transform: isHovered ? 'translateY(0)' : 'translateY(16px)',
+          }}
         >
           {image.title && (
             <h3 className="text-white font-migra text-xl font-medium mb-1 drop-shadow-lg">
@@ -120,28 +135,34 @@ function ImageCard({
               {image.description}
             </p>
           )}
-        </motion.div>
+        </div>
       )}
 
       {/* Index number */}
-      <motion.span
-        className="absolute top-4 left-4 text-xs text-white/60 font-light tracking-wider"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
+      <span
+        className="absolute top-4 left-4 text-xs text-white/60 font-light tracking-wider transition-opacity duration-400 ease-prestige"
+        style={{ opacity: isHovered ? 1 : 0 }}
       >
         {String(index + 1).padStart(2, '0')}
-      </motion.span>
+      </span>
     </motion.div>
   )
-}
+})
 
-export default function PortfolioGrid({ images }: PortfolioGridProps) {
+function PortfolioGrid({ images }: PortfolioGridProps) {
   const [selectedImage, setSelectedImage] = useState<PortfolioImage | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
 
   const sortedImages = [...images].sort((a, b) => a.order - b.order)
+  
+  const handleImageClick = useCallback((image: PortfolioImage) => {
+    setSelectedImage(image)
+  }, [])
+  
+  const handleClose = useCallback(() => {
+    setSelectedImage(null)
+  }, [])
 
   return (
     <>
@@ -157,9 +178,9 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
         <div className="max-w-screen-2xl mx-auto">
           {/* Header with animated reveal */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={prestigeTransition}
             className="mb-16"
           >
             <div className="overflow-hidden">
@@ -167,22 +188,23 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
                 className="font-migra text-4xl md:text-6xl lg:text-7xl font-medium"
                 initial={{ y: '100%' }}
                 animate={isInView ? { y: 0 } : { y: '100%' }}
-                transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ ...prestigeTransition, delay: 0.1 }}
               >
                 Portfolio
               </motion.h2>
             </div>
             <motion.div
-              className="h-px bg-gradient-to-r from-charcoal/30 via-accent to-transparent max-w-md mt-4"
-              initial={{ scaleX: 0, originX: 0 }}
+              className="h-px bg-gradient-to-r from-charcoal/30 via-accent to-transparent max-w-md mt-4 gpu"
+              initial={{ scaleX: 0 }}
               animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
-              transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ ...prestigeTransition, delay: 0.2, duration: 0.6 }}
+              style={{ transformOrigin: 'left' }}
             />
             <motion.p
               className="mt-4 text-charcoal/60 max-w-md"
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
+              transition={{ ...prestigeTransition, delay: 0.3 }}
             >
               A curated selection of editorial, commercial, and artistic work
             </motion.p>
@@ -193,7 +215,7 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
               className="text-center py-20"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ ...prestigeTransition, delay: 0.2 }}
             >
               <div className="w-20 h-20 mx-auto mb-6 border-2 border-dashed border-charcoal/20 rounded-full flex items-center justify-center">
                 <svg className="w-8 h-8 text-charcoal/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +234,7 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
                   key={image.id}
                   image={image}
                   index={index}
-                  onClick={() => setSelectedImage(image)}
+                  onClick={() => handleImageClick(image)}
                 />
               ))}
             </div>
@@ -224,7 +246,7 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
               className="mt-16 text-center"
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              transition={{ ...prestigeTransition, delay: 0.5 }}
             >
               <span className="text-sm text-charcoal/40 tracking-wider uppercase">
                 {sortedImages.length} {sortedImages.length === 1 ? 'image' : 'images'}
@@ -238,7 +260,7 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
         {selectedImage && (
           <Lightbox
             image={selectedImage}
-            onClose={() => setSelectedImage(null)}
+            onClose={handleClose}
             allImages={sortedImages}
             onNavigate={setSelectedImage}
           />
@@ -247,3 +269,5 @@ export default function PortfolioGrid({ images }: PortfolioGridProps) {
     </>
   )
 }
+
+export default memo(PortfolioGrid)

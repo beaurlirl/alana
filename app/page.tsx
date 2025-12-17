@@ -9,7 +9,7 @@ export default async function Home() {
   const data = await getPortfolioData()
   
   return (
-    <main className="min-h-screen">
+    <main className="h-screen w-screen overflow-hidden fixed inset-0">
       <Hero images={data.images} />
     </main>
   )

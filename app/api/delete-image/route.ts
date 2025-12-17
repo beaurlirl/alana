@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { del } from '@vercel/blob'
+import { unlink } from 'fs/promises'
+import path from 'path'
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
   return authCookie?.value === 'true'
+}
+
+// Check if Vercel Blob is configured
+function hasBlobCredentials(): boolean {
+  return !!process.env.BLOB_READ_WRITE_TOKEN
 }
 
 export async function POST(request: NextRequest) {
@@ -19,10 +26,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No filename provided' }, { status: 400 })
     }
 
-    // Only delete from Vercel Blob (URLs starting with https)
-    if (filename.startsWith('https://')) {
+    // If it's a Vercel Blob URL, delete from Blob
+    if (filename.startsWith('https://') && hasBlobCredentials()) {
       try {
         await del(filename)
+      } catch {
+        // File might not exist, that's okay
+      }
+    } 
+    // If it's a local file (doesn't start with http), delete locally
+    else if (!filename.startsWith('http')) {
+      try {
+        const filePath = path.join(process.cwd(), 'public', 'uploads', filename)
+        await unlink(filePath)
       } catch {
         // File might not exist, that's okay
       }

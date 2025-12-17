@@ -153,7 +153,7 @@ Once redeployed, test your admin panel:
     }
   ],
   "categories": ["Editorial", "Commercial", "Runway"],
-  "modelName": "Alana Cabanzo",
+  "modelName": "Alana Cavanzo",
   "heroTagline": "Model"
 }
 ```

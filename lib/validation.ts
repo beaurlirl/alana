@@ -38,7 +38,7 @@ export const deleteImageSchema = z.object({
 })
 
 // File upload validation
-export const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+export const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB for high-quality portfolio images
 export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
 
 export function validateImageFile(file: File): { valid: boolean; error?: string } {
@@ -52,7 +52,7 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
   if (file.size > MAX_FILE_SIZE) {
     return {
       valid: false,
-      error: 'File size exceeds 10MB limit.',
+      error: 'File size exceeds 50MB limit.',
     }
   }
 

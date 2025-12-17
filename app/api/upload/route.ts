@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
-import { validateImageFile, MAX_FILE_SIZE } from '@/lib/validation'
+import { writeFile, mkdir } from 'fs/promises'
+import path from 'path'
+import { validateImageFile } from '@/lib/validation'
+
+// Allow larger uploads (50MB)
+export const config = {
+  api: {
+    bodyParser: false,
+    responseLimit: '50mb',
+  },
+}
 
 function checkAuth(request: NextRequest): boolean {
   const authCookie = request.cookies.get('admin-auth')
   return authCookie?.value === 'true'
+}
+
+// Check if Vercel Blob is configured
+function hasBlobCredentials(): boolean {
+  return !!process.env.BLOB_READ_WRITE_TOKEN
 }
 
 export async function POST(request: NextRequest) {
@@ -34,17 +49,39 @@ export async function POST(request: NextRequest) {
       .toLowerCase()
     const filename = `${timestamp}-${sanitizedName}`
 
-    // Upload to Vercel Blob
-    const blob = await put(filename, file, {
-      access: 'public',
-      addRandomSuffix: false,
-    })
+    // If Vercel Blob is configured, use it (production)
+    if (hasBlobCredentials()) {
+      const blob = await put(filename, file, {
+        access: 'public',
+        addRandomSuffix: false,
+      })
 
+      return NextResponse.json({ 
+        success: true, 
+        filename: blob.url,
+        url: blob.url
+      })
+    }
+    
+    // Otherwise, save locally (development)
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
+    
+    // Ensure uploads directory exists
+    await mkdir(uploadsDir, { recursive: true })
+    
+    // Convert file to buffer and save
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    
+    const filePath = path.join(uploadsDir, filename)
+    await writeFile(filePath, buffer)
+    
     return NextResponse.json({ 
       success: true, 
-      filename: blob.url,
-      url: blob.url
+      filename: filename,  // Just the filename for local files
+      url: `/uploads/${filename}`
     })
+    
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ 

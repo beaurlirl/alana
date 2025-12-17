@@ -37,9 +37,12 @@ const nextConfig = {
       exclude: ['error', 'warn'],
     } : false,
   },
-  // Experimental features for better performance
+  // Experimental features
   experimental: {
-    optimizeCss: true,
+    // Allow larger file uploads (50MB)
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
   },
   // Headers for better performance and security
   async headers() {
