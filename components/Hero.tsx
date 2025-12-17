@@ -305,29 +305,29 @@ function Hero({ images = [] }: HeroProps) {
                   href={`/collections?category=${encodeURIComponent(currentCategory.category)}`}
                   className="group flex flex-col items-center w-full justify-center"
                 >
-                  {/* Image container - fills available space */}
+                  {/* Image container - 2X larger on mobile */}
                   <motion.div 
-                    className="relative w-full max-w-[90vw] md:max-w-[45vw] lg:max-w-[40vw]"
+                    className="relative w-[95vw] md:w-full md:max-w-[45vw] lg:max-w-[40vw]"
                     style={{ 
                       x: imageX, 
                       y: imageY,
                     }}
                   >
-                    <div className="relative w-full h-[55vh] md:h-[65vh]">
+                    <div className="relative w-full h-[45vh] md:h-[65vh]">
                       <Image
                         src={currentCategory.image}
                         alt={currentCategory.name}
                         fill
-                        className="object-contain object-center transition-transform duration-700 ease-out-quint group-hover:scale-[1.01]"
-                        sizes="(max-width: 768px) 90vw, 50vw"
+                        className="object-contain object-center transition-transform duration-700 ease-out-quint group-hover:scale-[1.01] scale-[2] md:scale-100"
+                        sizes="(max-width: 768px) 95vw, 50vw"
                         priority
                       />
                     </div>
                   </motion.div>
 
-                  {/* Category name - right below image */}
+                  {/* Category name - right below image, visible */}
                   <motion.h2 
-                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center mt-4 md:mt-6"
+                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center -mt-4 md:mt-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15, duration: 0.4 }}
