@@ -275,8 +275,8 @@ function Hero({ images = [] }: HeroProps) {
           </motion.div>
         </div>
 
-        {/* Right Panel - Category Image */}
-        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden md:-mt-[5vh] md:pr-[5%] lg:pr-[8%]">
+        {/* Right Panel - Category Image - bumped up on mobile */}
+        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden -mt-[12vh] md:-mt-[5vh] md:pr-[5%] lg:pr-[8%]">
           {/* Decorative vertical line - desktop */}
           <motion.div
             className="hidden md:block absolute right-[3%] lg:right-[5%] top-0 bottom-0 w-px bg-charcoal/10"
@@ -327,7 +327,7 @@ function Hero({ images = [] }: HeroProps) {
 
                   {/* Category name - right below image, visible */}
                   <motion.h2 
-                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center -mt-4 md:mt-6"
+                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center -mt-8 md:mt-6"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15, duration: 0.4 }}
