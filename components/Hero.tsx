@@ -291,13 +291,13 @@ function Hero({ images = [] }: HeroProps) {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div 
                 key={currentCategory.name}
-                initial={{ opacity: 0, y: 80, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -80, scale: 0.95 }}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -40 }}
                 transition={{ 
-                  duration: 0.6, 
-                  ease: [0.32, 0.72, 0, 1],
-                  opacity: { duration: 0.4 }
+                  duration: 0.8, 
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                  opacity: { duration: 0.5 }
                 }}
                 className="w-full flex flex-col items-center justify-center"
               >
@@ -305,21 +305,21 @@ function Hero({ images = [] }: HeroProps) {
                   href={`/collections?category=${encodeURIComponent(currentCategory.category)}`}
                   className="group flex flex-col items-center w-full justify-center"
                 >
-                  {/* Image container - 2X larger on mobile */}
+                  {/* Image container - larger on mobile, no scale animation */}
                   <motion.div 
-                    className="relative w-[95vw] md:w-full md:max-w-[45vw] lg:max-w-[40vw]"
+                    className="relative w-[180vw] md:w-full md:max-w-[45vw] lg:max-w-[40vw] -ml-[40vw] md:ml-0"
                     style={{ 
                       x: imageX, 
                       y: imageY,
                     }}
                   >
-                    <div className="relative w-full h-[45vh] md:h-[65vh]">
+                    <div className="relative w-full h-[50vh] md:h-[65vh]">
                       <Image
                         src={currentCategory.image}
                         alt={currentCategory.name}
                         fill
-                        className="object-contain object-center transition-transform duration-700 ease-out-quint group-hover:scale-[1.01] scale-[2] md:scale-100"
-                        sizes="(max-width: 768px) 95vw, 50vw"
+                        className="object-contain object-center transition-transform duration-700 ease-out-quint group-hover:scale-[1.01]"
+                        sizes="(max-width: 768px) 180vw, 50vw"
                         priority
                       />
                     </div>
@@ -327,10 +327,10 @@ function Hero({ images = [] }: HeroProps) {
 
                   {/* Category name - right below image, visible */}
                   <motion.h2 
-                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center -mt-4 md:mt-6"
-                    initial={{ opacity: 0, y: 20 }}
+                    className="font-migra text-3xl md:text-4xl lg:text-5xl text-charcoal italic tracking-wide text-center -mt-2 md:mt-6"
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15, duration: 0.4 }}
+                    transition={{ delay: 0.2, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                   >
                     {currentCategory.name}
                   </motion.h2>
